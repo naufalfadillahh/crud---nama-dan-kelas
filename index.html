@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nama dan Kota Asal</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #e9eff1; /* Latar belakang cerah */
+        }
+        h1 {
+            text-align: center;
+            color: #34495e; /* Warna gelap untuk teks */
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Bayangan lembut */
+        }
+        .form-section, .data-section {
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #f5f7fa; /* Warna latar belakang untuk section */
+        }
+        form {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Dua kolom untuk nama dan kota */
+            gap: 15px;
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        input[type="text"], input[type="submit"] {
+            padding: 12px;
+            border: 1px solid #bdc3c7; /* Warna border */
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus {
+            border-color: #3498db; /* Warna border saat fokus */
+            outline: none;
+        }
+        input[type="submit"] {
+            background-color: #2980b9; /* Warna biru tua */
+            color: white;
+            border: none;
+            cursor: pointer;
+            grid-column: 1 / -1; /* Full width */
+            transition: background-color 0.3s;
+            font-size: 1.1em; /* Ukuran font lebih besar */
+        }
+        input[type="submit"]:hover {
+            background-color: #1a6b8a; /* Warna lebih gelap saat hover */
+        }
+        .data-section {
+            margin-top: 20px;
+        }
+        #dataList {
+            margin-top: 20px;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .user-item {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto; /* Kolom untuk nama, kota, dan tombol */
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #bdc3c7;
+            background-color: #ffffff; /* Warna latar belakang item */
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .user-item:hover {
+            background-color: #f9f9f9; /* Efek hover item */
+        }
+        .edit-btn, .delete-btn, .sort-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 14px; /* Ukuran font tombol */
+        }
+        .edit-btn {
+            background-color: #3498db;
+            color: white;
+        }
+        .delete-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .sort-btn {
+            background-color: #2ecc71; /* Hijau untuk tombol sort */
+            color: white;
+            margin-left: 5px; /* Spasi antar tombol */
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .header span {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Nama dan Kota Asal</h1>
+    
+    <div class="form-section">
+        <form id="dataForm">
+            <input type="hidden" id="userId">
+            <label for="nama">Nama</label>
+            <input type="text" id="nama" placeholder="Nama Anda" required>
+            <label for="kota">Kota</label>
+            <input type="text" id="kota" placeholder="Kota Asal" required>
+            <input type="submit" value="Kirim">
+        </form>
+    </div>
+
+    <div class="data-section">
+        <h2>Daftar Pengguna</h2>
+        <div id="dataList">
+            <div class="user-item header">
+                <span><strong>Nama</strong> 
+                    <button class="sort-btn" onclick="sortByName()">Urutkan</button>
+                </span>
+                <span><strong>Kota</strong> 
+                    <button class="sort-btn" onclick="sortByCity()">Urutkan</button>
+                </span>
+                <span><strong>Aksi</strong></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let usersData = [];
+
+async function fetchData() {
+    const response = await fetch("get_data.php");
+    usersData = await response.json();
+    displayData(usersData);
+}
+
+function displayData(data) {
+    const dataList = document.getElementById("dataList");
+    // Clear existing data
+    dataList.innerHTML = `
+        <div class="user-item header">
+            <span><strong>Nama</strong> 
+                <button class="sort-btn" onclick="sortByName()">Urutkan</button>
+            </span>
+            <span><strong>Kota</strong> 
+                <button class="sort-btn" onclick="sortByCity()">Urutkan</button>
+            </span>
+            <span><strong>Aksi</strong></span>
+        </div>
+    `;
+
+    data.forEach(user => {
+        dataList.innerHTML += `
+            <div class="user-item">
+                <span>${user.nama}</span>
+                <span>${user.kota}</span>
+                <div>
+                    <button class="edit-btn" onclick="editData(${user.id}, '${user.nama}', '${user.kota}')">Edit</button>
+                    <button class="delete-btn" onclick="deleteData(${user.id})">Delete</button>
+                </div>
+            </div>
+        `;
+    });
+}
+
+document.getElementById("dataForm").onsubmit = async function(event) {
+    event.preventDefault();
+
+    const id = document.getElementById("userId").value;
+    const nama = document.getElementById("nama").value;
+    const kota = document.getElementById("kota").value;
+
+    const url = id ? "update_data.php" : "save_data.php";
+    const method = id ? "PUT" : "POST";
+
+    const response = await fetch(url, {
+        method: method,
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ id, nama, kota })
+    });
+
+    if (response.ok) {
+        fetchData();
+        document.getElementById("dataForm").reset();
+    }
+};
+
+async function editData(id, nama, kota) {
+    document.getElementById("userId").value = id;
+    document.getElementById("nama").value = nama;
+    document.getElementById("kota").value = kota;
+}
+
+async function deleteData(id) {
+    const response = await fetch("delete_data.php", {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ id })
+    });
+
+    if (response.ok) {
+        fetchData();
+    }
+}
+
+function sortByName() {
+    const sortedData = [...usersData].sort((a, b) => a.nama.localeCompare(b.nama));
+    displayData(sortedData);
+}
+
+function sortByCity() {
+    const sortedData = [...usersData].sort((a, b) => a.kota.localeCompare(b.kota));
+    displayData(sortedData);
+}
+
+// Fetch data on load
+fetchData();
+</script>
+
+</body>
+</html>
