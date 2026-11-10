@@ -1,0 +1,1 @@
+{ "framework": null, "buildCommand": "", "outputDirectory": ".", "rewrites": [ { "source": "/get_data.php", "destination": "/api/demo?op=get" }, { "source": "/save_data.php", "destination": "/api/demo?op=save" }, { "source": "/update_data.php", "destination": "/api/demo?op=update" }, { "source": "/delete_data.php", "destination": "/api/demo?op=delete" } ] }
