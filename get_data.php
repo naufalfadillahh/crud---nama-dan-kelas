@@ -1,24 +1,4 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "kota_db";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    die("Koneksi gagal: " . $conn->connect_error);
-}
-
-$sql = "SELECT * FROM pengguna";
-$result = $conn->query($sql);
-$users = [];
-
-if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {
-        $users[] = $row;
-    }
-}
-
-echo json_encode($users);
-$conn->close();
-?>
+require __DIR__ . '/db.php';
+$result = $conn->query('SELECT id, nama, kota FROM pengguna ORDER BY id');
+reply(200, $result ? $result->fetch_all(MYSQLI_ASSOC) : []);

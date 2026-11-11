@@ -1,18 +1,7 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "kota_db";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    die("Koneksi gagal: " . $conn->connect_error);
-}
-
-$data = json_decode(file_get_contents("php://input"), true);
-$id = $data['id'];
-
-$sql = "DELETE FROM pengguna WHERE id=$id";
-$conn->query($sql);
-$conn->close();
-?>
+require __DIR__ . '/db.php';
+$id = (int)(body()['id'] ?? 0);
+if ($id <= 0) reply(400, ['error' => 'ID tidak valid']);
+$stmt = $conn->prepare('DELETE FROM pengguna WHERE id = ?');
+$stmt->bind_param('i', $id);
+$stmt->execute() ? reply(200, ['ok' => true]) : reply(500, ['error' => 'Gagal menghapus']);
